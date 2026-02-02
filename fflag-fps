@@ -1,96 +1,139 @@
 --================================================
--- ALL-IN-ONE: EXTREME LOW VISUAL + NO FX + FPS
--- + ESP POV (BOX + TRACER) + TOGGLE (SAFE)
+-- FULL EXTREME LOW GRAPHIC + FPS + ESP (NO LOADSTRING)
+-- Mobile Safe | PC Better
 --================================================
 
--- Services
+--================ FPS CAP =================
+pcall(function()
+	if setfpscap then setfpscap(120) end
+	if set_fps_cap then set_fps_cap(120) end
+end)
+
+--================ SERVICES =================
 local Players = game:GetService("Players")
 local Lighting = game:GetService("Lighting")
 local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
 local camera = workspace.CurrentCamera
 
-------------------------------------------------
--- 1) EXTREME LOW VISUAL (SIÊU XẤU – SIÊU NHẸ)
-------------------------------------------------
+--================ 1) LIGHTING SIÊU XẤU =================
 Lighting.GlobalShadows = false
 Lighting.Brightness = 1
 Lighting.EnvironmentDiffuseScale = 0
 Lighting.EnvironmentSpecularScale = 0
-Lighting.Ambient = Color3.fromRGB(200,200,200)
-Lighting.OutdoorAmbient = Color3.fromRGB(200,200,200)
-Lighting.FogStart = 40
-Lighting.FogEnd = 120
+Lighting.Ambient = Color3.fromRGB(180,180,180)
+Lighting.OutdoorAmbient = Color3.fromRGB(180,180,180)
+Lighting.FogStart = 15
+Lighting.FogEnd = 70
 
-for _, v in pairs(Lighting:GetChildren()) do
-	if v:IsA("PostEffect") then v.Enabled = false end
+for _, v in ipairs(Lighting:GetChildren()) do
+	if v:IsA("PostEffect") then
+		v.Enabled = false
+	end
 end
+
 camera.FieldOfView = 60
 
-------------------------------------------------
--- 2) MAP: XOÁ TEXTURE / CHI TIẾT
-------------------------------------------------
-for _, obj in pairs(workspace:GetDescendants()) do
-	if obj:IsA("BasePart") then
-		obj.Material = Enum.Material.Plastic
-		obj.CastShadow = false
-		obj.Reflectance = 0
+--================ 2) XOÁ MAP DETAIL =================
+for _, o in ipairs(workspace:GetDescendants()) do
+	if o:IsA("BasePart") then
+		o.Material = Enum.Material.Plastic
+		o.CastShadow = false
+		o.Reflectance = 0
 	end
-	if obj:IsA("SpecialMesh") then obj.TextureId = "" end
-	if obj:IsA("Texture") or obj:IsA("Decal") then obj:Destroy() end
+	if o:IsA("SpecialMesh") then
+		o.TextureId = ""
+	end
+	if o:IsA("Texture") or o:IsA("Decal") then
+		o:Destroy()
+	end
 end
 
-------------------------------------------------
--- 3) XOÁ HIỆU ỨNG SKILL (REALTIME)
-------------------------------------------------
-local function disableEffect(o)
-	if o:IsA("ParticleEmitter") or o:IsA("Trail") or o:IsA("Beam")
-	or o:IsA("Fire") or o:IsA("Smoke") or o:IsA("Explosion")
-	or o:IsA("PointLight") or o:IsA("SpotLight") or o:IsA("SurfaceLight") then
-		o.Enabled = false
+--================ 3) NUKE SKILL / VFX (CỰC GẮT) =================
+local function destroyFX(o)
+	if o:IsA("ParticleEmitter")
+	or o:IsA("Trail")
+	or o:IsA("Beam")
+	or o:IsA("Explosion")
+	or o:IsA("Fire")
+	or o:IsA("Smoke")
+	or o:IsA("Sparkles")
+	or o:IsA("PointLight")
+	or o:IsA("SpotLight")
+	or o:IsA("SurfaceLight")
+	or o:IsA("SpecialMesh") then
+		o:Destroy()
 	end
-	if o:IsA("Sound") then o.Volume = 0 end
-end
-for _, o in pairs(workspace:GetDescendants()) do disableEffect(o) end
-workspace.DescendantAdded:Connect(disableEffect)
 
-------------------------------------------------
--- 4) NHÂN VẬT: XOÁ SKIN / PHỤ KIỆN (SAFE)
-------------------------------------------------
-local function ultraLowCharacter(char)
-	for _, a in pairs(char:GetChildren()) do
-		if a:IsA("Accessory") then a:Destroy() end
+	if o:IsA("Sound") then
+		o.Volume = 0
+		o:Stop()
 	end
-	local s = char:FindFirstChildOfClass("Shirt"); if s then s:Destroy() end
-	local p = char:FindFirstChildOfClass("Pants"); if p then p:Destroy() end
-	for _, part in pairs(char:GetChildren()) do
-		if part:IsA("BasePart") then
-			part.Material = Enum.Material.Plastic
-			part.Color = Color3.fromRGB(160,160,160)
-			part.CastShadow = false
+
+	if o:IsA("BasePart") then
+		local n = o.Name:lower()
+		if n:find("skill") or n:find("effect") or n:find("vfx") or n:find("fx") then
+			o.Transparency = 1
+			o.CanCollide = false
+			o.CastShadow = false
 		end
 	end
 end
-if player.Character then ultraLowCharacter(player.Character) end
-player.CharacterAdded:Connect(function(c) task.wait(0.2); ultraLowCharacter(c) end)
 
-------------------------------------------------
--- 5) FPS COUNTER
-------------------------------------------------
+for _, o in ipairs(workspace:GetDescendants()) do
+	destroyFX(o)
+end
+
+workspace.DescendantAdded:Connect(function(o)
+	task.wait()
+	destroyFX(o)
+end)
+
+--================ 4) NHÂN VẬT: XOÁ SKIN =================
+local function lowChar(char)
+	for _, a in ipairs(char:GetChildren()) do
+		if a:IsA("Accessory") then
+			a:Destroy()
+		end
+	end
+
+	for _, c in ipairs(char:GetChildren()) do
+		if c:IsA("Shirt") or c:IsA("Pants") then
+			c:Destroy()
+		end
+	end
+
+	for _, p in ipairs(char:GetChildren()) do
+		if p:IsA("BasePart") then
+			p.Material = Enum.Material.Plastic
+			p.Color = Color3.fromRGB(140,140,140)
+			p.CastShadow = false
+		end
+	end
+end
+
+if player.Character then
+	lowChar(player.Character)
+end
+player.CharacterAdded:Connect(function(c)
+	task.wait(0.2)
+	lowChar(c)
+end)
+
+--================ 5) FPS COUNTER =================
 local fpsGui = Instance.new("ScreenGui")
-fpsGui.Name = "FPSGui"
 fpsGui.ResetOnSpawn = false
 fpsGui.Parent = player:WaitForChild("PlayerGui")
 
 local fpsLabel = Instance.new("TextLabel")
-fpsLabel.Size = UDim2.fromOffset(120,36)
+fpsLabel.Size = UDim2.fromOffset(120,34)
 fpsLabel.Position = UDim2.fromOffset(10,10)
 fpsLabel.BackgroundColor3 = Color3.fromRGB(0,0,0)
 fpsLabel.BackgroundTransparency = 0.4
+fpsLabel.TextColor3 = Color3.fromRGB(0,255,0)
 fpsLabel.TextStrokeTransparency = 0
 fpsLabel.Font = Enum.Font.SourceSansBold
 fpsLabel.TextSize = 18
-fpsLabel.Text = "FPS: --"
 fpsLabel.Parent = fpsGui
 
 local frames, last = 0, tick()
@@ -100,90 +143,72 @@ RunService.RenderStepped:Connect(function()
 	if now - last >= 1 then
 		local fps = math.floor(frames / (now - last))
 		fpsLabel.Text = "FPS: "..fps
-		fpsLabel.TextColor3 =
-			(fps < 30 and Color3.fromRGB(255,60,60))
-			or (fps < 50 and Color3.fromRGB(255,200,60))
-			or Color3.fromRGB(0,255,0)
-		frames, last = 0, now
+		frames = 0
+		last = now
 	end
 end)
 
-------------------------------------------------
--- 6) ESP POV (BOX + TRACER) + TOGGLE
-------------------------------------------------
-local ESPEnabled = true
-local ESPColor = Color3.fromRGB(255,80,80)
-local MAX_DISTANCE = 1500
+--================ 6) ESP POV (HIGHLIGHT) =================
+local ESP_ON = true
+local ESP_COLOR = Color3.fromRGB(255,70,70)
 
--- Toggle GUI
-local espGui = Instance.new("ScreenGui")
-espGui.Name = "ESPToggleGui"
-espGui.ResetOnSpawn = false
-espGui.Parent = player:WaitForChild("PlayerGui")
+local espBtn = Instance.new("TextButton")
+espBtn.Size = UDim2.fromOffset(120,38)
+espBtn.Position = UDim2.fromOffset(10,55)
+espBtn.BackgroundColor3 = Color3.fromRGB(25,25,25)
+espBtn.TextColor3 = Color3.fromRGB(0,255,0)
+espBtn.Font = Enum.Font.SourceSansBold
+espBtn.TextSize = 16
+espBtn.Text = "ESP: ON"
+espBtn.Parent = fpsGui
 
-local btn = Instance.new("TextButton")
-btn.Size = UDim2.fromOffset(120,40)
-btn.Position = UDim2.fromOffset(10,60)
-btn.BackgroundColor3 = Color3.fromRGB(30,30,30)
-btn.TextColor3 = Color3.fromRGB(0,255,0)
-btn.Font = Enum.Font.SourceSansBold
-btn.TextSize = 16
-btn.Text = "ESP: ON"
-btn.Parent = espGui
-
-btn.MouseButton1Click:Connect(function()
-	ESPEnabled = not ESPEnabled
-	btn.Text = ESPEnabled and "ESP: ON" or "ESP: OFF"
-	btn.TextColor3 = ESPEnabled and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,60,60)
+espBtn.MouseButton1Click:Connect(function()
+	ESP_ON = not ESP_ON
+	espBtn.Text = ESP_ON and "ESP: ON" or "ESP: OFF"
+	espBtn.TextColor3 = ESP_ON and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,60,60)
 end)
 
-local function inPOV(worldPos)
+local function inPOV(pos)
 	local camCF = camera.CFrame
-	local dir = (worldPos - camCF.Position).Unit
-	return camCF.LookVector:Dot(dir) > 0.2 -- hẹp POV
+	local dir = (pos - camCF.Position).Unit
+	return camCF.LookVector:Dot(dir) > 0.3
 end
 
-local function createESP(plr)
+local function setupESP(plr)
 	if plr == player then return end
 
-	local box = Drawing.new("Square")
-	box.Color = ESPColor; box.Thickness = 1; box.Filled = false; box.Visible = false
-
-	local line = Drawing.new("Line")
-	line.Color = ESPColor; line.Thickness = 1; line.Visible = false
+	local hl = Instance.new("Highlight")
+	hl.FillColor = ESP_COLOR
+	hl.OutlineColor = ESP_COLOR
+	hl.FillTransparency = 0.6
+	hl.OutlineTransparency = 0
+	hl.Enabled = false
+	hl.Parent = fpsGui
 
 	RunService.RenderStepped:Connect(function()
-		if not ESPEnabled then
-			box.Visible = false; line.Visible = false; return
+		if not ESP_ON then
+			hl.Enabled = false
+			return
 		end
 		if not plr.Character or not plr.Character:FindFirstChild("HumanoidRootPart") then
-			box.Visible = false; line.Visible = false; return
+			hl.Enabled = false
+			return
 		end
-
-		local hrp = plr.Character.HumanoidRootPart
-		local dist = (camera.CFrame.Position - hrp.Position).Magnitude
-		if dist > MAX_DISTANCE or not inPOV(hrp.Position) then
-			box.Visible = false; line.Visible = false; return
+		if not inPOV(plr.Character.HumanoidRootPart.Position) then
+			hl.Enabled = false
+			return
 		end
-
-		local pos, onScreen = camera:WorldToViewportPoint(hrp.Position)
-		if not onScreen then
-			box.Visible = false; line.Visible = false; return
-		end
-
-		local scale = 1 / (pos.Z / 50)
-		local size = Vector2.new(30,50) * scale
-		box.Size = size
-		box.Position = Vector2.new(pos.X - size.X/2, pos.Y - size.Y/2)
-		box.Visible = true
-
-		line.From = Vector2.new(camera.ViewportSize.X/2, camera.ViewportSize.Y)
-		line.To = Vector2.new(pos.X, pos.Y)
-		line.Visible = true
+		hl.Adornee = plr.Character
+		hl.Enabled = true
 	end)
 end
 
-for _, plr in pairs(Players:GetPlayers()) do createESP(plr) end
-Players.PlayerAdded:Connect(function(plr) task.wait(1); createESP(plr) end)
+for _, p in ipairs(Players:GetPlayers()) do
+	setupESP(p)
+end
+Players.PlayerAdded:Connect(function(p)
+	task.wait(1)
+	setupESP(p)
+end)
 
-print("ALL-IN-ONE VISUAL + ESP POV READY")
+print("FULL EXTREME MODE READY | NO LOADSTRING | 120 FPS")
